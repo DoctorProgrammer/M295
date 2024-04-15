@@ -16,8 +16,12 @@ Stellen Sie sicher, dass keine der Attribute leer sein kann. Geben sie ansonsten
 */
 
 const EXPRESS = require('express');
+const BODYPARSER = require('body-parser');
 const APP = EXPRESS();
 const PORT = 3000;
+
+APP.use(EXPRESS.json());
+APP.use(BODYPARSER.urlencoded({ extended: true }));
 
 let books = [
     {
@@ -87,13 +91,8 @@ APP.get("/books/:isbn", (req, res) => {
 });
 
 APP.post("/books", (req, res) => {
-    const BODY = req.body;
-    const BOOK = {
-        isbn: BODY.isbn,
-        title: BODY.title,
-        year: BODY.year,
-        author: BODY.author
-    };
+    const BOOK = req.body;
+    console.log(BOOK);
     books.push(BOOK);
     res.send(BOOK);
 });
