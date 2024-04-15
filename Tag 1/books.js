@@ -135,6 +135,69 @@ APP.patch("/books/:isbn", (req, res) => {
     }
 });
 
+/*
+GET	/lends	Gibt alle Ausleihen als als JSON zurück
+GET	/lends/{id}	Gibt alle Informationen zu einer Ausleihe als JSON zurück
+POST	/lends	Leiht ein neues Buch aus
+DELETE	/lends/{id}	Bringt ein Buch zurück
+*/
+
+let lends = [
+    {
+        id: '1',
+        book: {
+            title: 'Harry Potter',
+            author: 'J.K. Rowling',
+            isbn: '9781408855652'
+        }
+    },
+    {
+        id: '2',
+        book: {
+            title: 'Lord of the Rings',
+            author: 'J.R.R. Tolkien',
+            isbn: '9780544003415'
+        }
+    },
+]
+
+APP.get('/lends', (req, res) => {
+    console.log(`Port: ${port}\tGET: /lends\t\t ${new Date().toString()}`);
+
+    res.send(lends);
+});
+
+APP.get('/lends/:id', (req, res) => {
+    console.log(`Port: ${port}\tGET: /lends/:id\t\t ${new Date().toString()}`);
+    const id = req.params.id;
+    const lendsById = lends.filter((lend) => lend.id === id); // Funktioniert nicht
+
+    res.send(lendsById);
+});
+
+APP.post('/lends', (req, res) => {
+    console.log(`Port: ${port}\tPOST: /lends\t\t ${new Date().toString()}`);
+    const book = books.filter((book) => book.isbn === req.query.isbn);
+    const lend = {
+        id: lends.length + 1,
+        book: book[0]
+    }
+    lends.push(lend);
+
+    res.send(lends);
+});
+
+APP.patch('/lends/:id', (req, res) => {
+    console.log(`Port: ${port}\tPATCH: /lends/:id\t\t ${new Date().toString()}`);
+    const id = req.params.id;
+    const book = books.filter((book) => book.isbn === req.query.isbn);
+    const lend = lends.filter((lend) => lend.id === id);
+    const index = lends.indexOf(lend[0]);
+    lends[index].book = book;
+
+    res.send(lends[index]);
+});
+
 APP.listen(PORT, () => {
     console.log("Server is listening on Port: " + PORT)
 });
