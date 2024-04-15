@@ -29,7 +29,37 @@ app.get('/name', (req, res) => {
 });
 
 app.get('/html', (req, res) => {
-    res.sendFile(__dirname + "index.html");
+    res.sendFile(__dirname + "/index.html");
+});
+
+app.get('/image', (req, res) => {
+    res.sendFile(__dirname + "/image.jpg");
+});
+
+app.get('/teapot', (req, res) => {
+    res.status(418).send('I am a teapot');
+});
+
+app.get('/user-agent', (req, res) => {
+    res.send(req.headers['user-agent']);
+});
+
+app.get('/secret', (req, res) => {
+    res.sendStatus(403);
+});
+
+app.get('/xml', (req, res) => {
+    res.sendFile(__dirname + "/data.xml");
+});
+
+app.get('/me', (req, res) => {
+    res.send({
+        "Vorname": "Max",
+        "Nachname": "Muster",
+        "Alter": 42,
+        "Wohnort": "Musterhausen",
+        "Augenfarbe": "blau"
+    });
 });
 
 app.listen(port, () => {
