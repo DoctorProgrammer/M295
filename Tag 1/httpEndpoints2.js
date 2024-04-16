@@ -55,17 +55,16 @@ APP.get('/chuck', async(req, res) => {
     res.send(joke.value.replace("Chuck Norris", name));
 });
 
+let me = {
+    "Vorname": "Max",
+    "Nachname": "Muster",
+    "Alter": 42,
+    "Wohnort": "Musterhausen",
+    "Augenfarbe": "blau"
+};
+
 APP.patch('/me', (req, res) => {
-    let me = {
-        "Vorname": "Max",
-        "Nachname": "Muster",
-        "Alter": 42,
-        "Wohnort": "Musterhausen",
-        "Augenfarbe": "blau"
-    };
-    for (let key in req.body) {
-        me[key] = req.body[key];
-    }
+    me = { ...me, ...req.body }; // ... ist der spread operator, nimmt alle Eigenschaften von req.body und fügt sie in ein neues Objekt ein, das dann me überschreibt
     res.send(me);
 });
 
