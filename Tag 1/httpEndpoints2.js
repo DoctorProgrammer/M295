@@ -61,7 +61,9 @@ APP.get('/chuck', (req, res) => {
         } else if (response.statusCode !== 200) {
             console.log('Status:', response.statusCode);
         } else {
-            res.send(data.value);
+            // change all occurrences of "Chuck Norris" to the name provided in the query
+            let joke = data.value.replace(/Chuck Norris/g, name);
+            res.send(joke);
         }
     });
 });

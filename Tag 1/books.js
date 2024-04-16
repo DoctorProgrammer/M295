@@ -16,12 +16,13 @@ Stellen Sie sicher, dass keine der Attribute leer sein kann. Geben sie ansonsten
 */
 
 const EXPRESS = require('express');
-const BODYPARSER = require('body-parser');
+const SESSION = require('express-session');
 const APP = EXPRESS();
 const PORT = 3000;
 
+APP.use(SESSION({ secret: 'geheim', resave: false, saveUninitialized: true }));
+APP.use(EXPRESS.urlencoded({ extended: true }));
 APP.use(EXPRESS.json());
-APP.use(BODYPARSER.urlencoded({ extended: true }));
 
 let books = [
     {
@@ -198,6 +199,61 @@ APP.patch('/lends/:id', (req, res) => {
     res.send(lends[index]);
 });
 
+/*
+Erweitern Sie Ihre REST API der Bibliothek. Erstellen Sie die Endpunkte für Login/Logout und schützen Sie die Endpunkte der Ressource Lend vor Zugriffen ohne Login.
+
+POST	/login	    Überprüft die als mitgegebenen Parameter email und password und markiert die Session als «authentifiziert»
+GET	    /verify	    Gibt den Statuscode 200 sowie die E-Mail Adresse des Benutzers zurück, wenn die Session als authentifiziert markiert wurde, andernfalls wird der Statuscode 401 zurück gegeben
+DELETE	/logout	    Markiert die aktuelle Session als «nicht authentifiziert» und gibt den Statuscode 204 zurück
+*/
+
+let users = [
+    {
+        email: 'zli@zli.ch',
+        password: '1234'
+    },
+    {
+        email: 'zli1@zli.ch',
+        password: '12345'
+    }
+]
+
+APP.post('/login', (req, res) => {
+    log(req, res);
+    
+    const email = req.query.email;
+    const password = req.query.password;
+    const user = users.filter((user) => user.email === email && user.password === password);
+
+    if (user.length > 0) {
+        req.session.authenticated = true;
+        res.send('Login successful');
+    } else {
+        res.status(401).send('Login failed');
+    }
+});
+
+APP.get('/verify', (req, res) => {
+    log(req, res);
+
+    if (req.session.authenticated) {
+        res.status(200).send(req.query.email);
+    } else {
+        res.status(401).send('Unauthorized');
+    }
+});
+
+APP.delete('/logout', (req, res) => {
+    log(req, res);
+    
+    req.session.authenticated = false;
+    res.status(204).send('Logout successful');
+});
+
 APP.listen(PORT, () => {
     console.log("Server is listening on Port: " + PORT)
 });
+
+function log(req, res) {
+    console.log(`Port: ${PORT}\t${req.method}\t${req.originalUrl}\t${new Date().toString()}`);
+}
