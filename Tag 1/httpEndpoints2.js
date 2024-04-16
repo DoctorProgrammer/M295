@@ -45,27 +45,14 @@ APP.get('/secret2', (req, res) => {
     }
 });
 
-APP.get('/chuck', (req, res) => {
+APP.get('/chuck', async(req, res) => {
     let name = req.query.name;
     let url = "https://api.chucknorris.io/jokes/random";
-    if (name) {
-        url += "?name=" + name;
-    }
-    REQUEST.get({
-        url: url,
-        json: true,
-        headers: { 'User-Agent': 'request' }
-    }, (err, response, data) => {
-        if (err) {
-            console.log('Error:', err);
-        } else if (response.statusCode !== 200) {
-            console.log('Status:', response.statusCode);
-        } else {
-            // change all occurrences of "Chuck Norris" to the name provided in the query
-            let joke = data.value.replace(/Chuck Norris/g, name);
-            res.send(joke);
-        }
-    });
+    
+    const jokeResponse = await fetch(url);
+    const joke = await jokeResponse.json();
+
+    res.send(joke.value.replace("Chuck Norris", name));
 });
 
 APP.patch('/me', (req, res) => {
