@@ -1,0 +1,20 @@
+{
+  "name": "m295",
+  "version": "1.0.0",
+  "description": "ZLI-Modul 15.04.24. - 19.04.24.",
+  "main": "./Tag 1/books.js",
+  "scripts": {
+    "start": "node \"Tag 1\\books.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "swagger": "node \"Tag 2\\swagger.js\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "request": "^2.88.2",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0"
+  }
+}
