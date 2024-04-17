@@ -146,19 +146,11 @@ DELETE	/lends/{id}	Bringt ein Buch zurück
 let lends = [
     {
         id: '1',
-        book: {
-            title: 'Harry Potter',
-            author: 'J.K. Rowling',
-            isbn: '9781408855652'
-        }
+        isbn: '978-3-16-148410-0',
     },
     {
         id: '2',
-        book: {
-            title: 'Lord of the Rings',
-            author: 'J.R.R. Tolkien',
-            isbn: '9780544003415'
-        }
+        isbn: '978-3-16-148410-0',
     },
 ]
 
@@ -172,31 +164,31 @@ APP.get('/lends/:id', (req, res) => {
     console.log(`Port: ${port}\tGET: /lends/:id\t\t ${new Date().toString()}`);
     const id = req.params.id;
     const lendsById = lends.filter((lend) => lend.id === id); // Funktioniert nicht
+    const book = books.filter((book) => book.isbn === lendsById[0].isbn);
 
-    res.send(lendsById);
+    // send the book which has the isbn as the isbn in the lends list
+    res.send(book[0]);
 });
 
 APP.post('/lends', (req, res) => {
     console.log(`Port: ${port}\tPOST: /lends\t\t ${new Date().toString()}`);
-    const book = books.filter((book) => book.isbn === req.query.isbn);
-    const lend = {
-        id: lends.length + 1,
-        book: book[0]
-    }
+    const lend = req.body.isbn;
+    lend.id = lends.length + 1;
     lends.push(lend);
-
-    res.send(lends);
 });
 
 APP.patch('/lends/:id', (req, res) => {
-    console.log(`Port: ${port}\tPATCH: /lends/:id\t\t ${new Date().toString()}`);
+    console.log(`Port: ${PORT}\tPATCH: /lends/:id\t\t ${new Date().toString()}`);
     const id = req.params.id;
-    const book = books.filter((book) => book.isbn === req.query.isbn);
-    const lend = lends.filter((lend) => lend.id === id);
-    const index = lends.indexOf(lend[0]);
-    lends[index].book = book;
+    const lendIndex = lends.findIndex((lend) => lend.id === id);
+    const newLend = req.body;
 
-    res.send(lends[index]);
+    if (lendIndex >= 0) {
+        lends[lendIndex] = { ...lends[lendIndex], ...newLend };
+        res.send(lends[lendIndex]);
+    } else {
+        res.status(404).json({ error: "Lend not found" });
+    }
 });
 
 /*
