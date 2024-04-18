@@ -7,6 +7,11 @@ APP.use(SESSION({ secret: 'geheim', resave: false, saveUninitialized: true }));
 APP.use(EXPRESS.urlencoded({ extended: true }));
 APP.use(EXPRESS.json());
 
+APP.use((req, res, next) => {
+    console.log(req.method + "\t" + req.url);
+    next();
+});
+
 let books = [
     {
         isbn: "978-3-16-148410-0",
@@ -63,12 +68,21 @@ let lends = [
         isbn: "978-3-16-148410-0",
         customer_id: "zli@zli.ch",
         borrowed_at: "2024-04-18T13:54:56.234Z"
+    },
+    {
+        isbn: "978-0-553-21311-3",
+        customer_id: "ro.trachsel@vtxfree.ch",
+        borrowed_at: "2024-04-18T13:54:56.234Z"
     }
 ];
 
 let users = [
     {
         email: 'zli@zli.ch',
+        password: '1234'
+    },
+    {
+        email: 'ro.trachsel@vtxfree.ch',
         password: '1234'
     }
 ];
@@ -137,13 +151,15 @@ APP.patch("/books/:isbn", (req, res) => {
 });
 
 APP.get('/lends', verifyAuth, (req, res) => {
-    const lendBooks = books.filter((book) => lends.map((lend) => lend.isbn).includes(book.isbn));
-    res.send(lendBooks);
+    // only show books that are lent by the current user
+    const userLends = lends.filter((lend) => lend.customer_id === req.session.user_id);
+    res.send(userLends);
 });
 
 APP.get('/lends/:isbn', verifyAuth, (req, res) => {
+    // only show if this book is lent by the current user
     const isbn = req.params.isbn;
-    const lend = lends.find((lend) => lend.isbn === isbn);
+    const lend = lends.find((lend) => lend.isbn === isbn && lend.customer_id === req.session.user_id);
 
     if (lend) {
         res.send(lend);
