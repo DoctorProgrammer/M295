@@ -93,9 +93,12 @@ APP.get("/books/:isbn", (req, res) => {
 
 APP.post("/books", (req, res) => {
     const BOOK = req.body;
-    console.log(BOOK);
-    books.push(BOOK);
-    res.send(BOOK);
+    if (BOOK.isbn && BOOK.title && BOOK.year && BOOK.author) {
+        books.push(BOOK);
+        res.send(BOOK);
+    } else {
+        res.status(422).json({ error: "Missing attribute" });
+    }
 });
 
 APP.put("/books/:isbn", (req, res) => {
@@ -155,13 +158,13 @@ let lends = [
 ]
 
 APP.get('/lends', (req, res) => {
-    console.log(`Port: ${port}\tGET: /lends\t\t ${new Date().toString()}`);
+    console.log(`Port: ${PORT}\tGET: /lends\t\t ${new Date().toString()}`);
 
     res.send(lends);
 });
 
 APP.get('/lends/:id', (req, res) => {
-    console.log(`Port: ${port}\tGET: /lends/:id\t\t ${new Date().toString()}`);
+    console.log(`Port: ${PORT}\tGET: /lends/:id\t\t ${new Date().toString()}`);
     const id = req.params.id;
     const lendsById = lends.filter((lend) => lend.id === id); // Funktioniert nicht
     const book = books.filter((book) => book.isbn === lendsById[0].isbn);
@@ -171,10 +174,26 @@ APP.get('/lends/:id', (req, res) => {
 });
 
 APP.post('/lends', (req, res) => {
-    console.log(`Port: ${port}\tPOST: /lends\t\t ${new Date().toString()}`);
+    console.log(`Port: ${PORT}\tPOST: /lends\t\t ${new Date().toString()}`);
     const lend = req.body.isbn;
-    lend.id = lends.length + 1;
-    lends.push(lend);
+    // check if the book exists in the books list
+    const book = books.filter((book) => book.isbn === lend);
+
+    // if book is already in the lends list
+    if (lends.map((lend) => lend.isbn).includes(lend)) {
+        res.status(409).json({ error: "Book already lent" });
+        return;
+    }
+
+    if (book.length > 0) {
+        // generate a random id
+        const id = Math.floor(Math.random() * 1000).toString();
+        // add the lend to the lends list
+        lends.push({ id: id, isbn: lend });
+        res.send({ id: id, isbn: lend });
+    } else {
+        res.status(404).json({ error: "Book not found" });
+    }
 });
 
 APP.patch('/lends/:id', (req, res) => {
