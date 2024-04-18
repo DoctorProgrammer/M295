@@ -1,0 +1,240 @@
+{
+    "v": 2,
+    "name": "Buchhandlung API Tests",
+    "folders": [],
+    "requests": [
+        {
+            "preRequestScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "headers": [],
+            "body": {
+                "contentType": null,
+                "body": null
+            },
+            "requestVariables": [],
+            "endpoint": "http://localhost:3000/books",
+            "v": "3",
+            "name": "Alle Bücher abrufen",
+            "testScript": "",
+            "method": "GET",
+            "params": []
+        },
+        {
+            "auth": {
+                "authActive": false,
+                "authType": "none"
+            },
+            "endpoint": "http://localhost:3000/books/978-3-16-148410-0",
+            "preRequestScript": "",
+            "headers": [],
+            "method": "GET",
+            "name": "Einzelnes Buch abrufen",
+            "testScript": "",
+            "v": "3",
+            "params": [],
+            "requestVariables": [],
+            "body": {
+                "contentType": null,
+                "body": null
+            }
+        },
+        {
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "endpoint": "http://localhost:3000/books",
+            "requestVariables": [],
+            "headers": [],
+            "name": "Neues Buch hinzufügen",
+            "method": "POST",
+            "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"isbn\": \"978-3-16-148410-1\",\n  \"title\": \"Der Herr der Ringe\",\n  \"year\": 1954,\n  \"author\": \"J.R.R. Tolkien\"\n}"
+            },
+            "params": [],
+            "v": "3"
+        },
+        {
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "headers": [],
+            "method": "PUT",
+            "requestVariables": [],
+            "endpoint": "http://localhost:3000/books/978-3-16-148410-0",
+            "testScript": "",
+            "preRequestScript": "",
+            "params": [],
+            "name": "Buch aktualisieren",
+            "v": "3",
+            "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"isbn\": \"978-3-16-148410-0\",\n  \"title\": \"Der Hobbit\",\n  \"year\": 1937,\n  \"author\": \"J.R.R. Tolkien\"\n}"
+            }
+        },
+        {
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "endpoint": "http://localhost:3000/books/978-3-16-148410-1",
+            "requestVariables": [],
+            "headers": [],
+            "name": "Buch löschen",
+            "method": "DELETE",
+            "body": {
+                "body": null,
+                "contentType": null
+            },
+            "params": [],
+            "v": "3"
+        },
+        {
+            "preRequestScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "headers": [],
+            "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"email\": \"zli@zli.ch\",\n  \"password\": \"1234\"\n}"
+            },
+            "requestVariables": [],
+            "endpoint": "http://localhost:3000/login",
+            "v": "3",
+            "name": "Einloggen",
+            "testScript": "",
+            "method": "POST",
+            "params": []
+        },
+        {
+            "auth": {
+                "authActive": false,
+                "authType": "none"
+            },
+            "endpoint": "http://localhost:3000/logout",
+            "preRequestScript": "",
+            "headers": [],
+            "method": "DELETE",
+            "name": "Ausloggen",
+            "testScript": "",
+            "v": "3",
+            "params": [],
+            "requestVariables": [],
+            "body": {
+                "contentType": null,
+                "body": null
+            }
+        },
+        {
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "endpoint": "http://localhost:3000/verify",
+            "requestVariables": [],
+            "headers": [],
+            "name": "Authentifizierung überprüfen",
+            "method": "GET",
+            "body": {
+                "body": null,
+                "contentType": null
+            },
+            "params": [],
+            "v": "3"
+        },
+        {
+            "preRequestScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "headers": [],
+            "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"isbn\": \"978-3-16-148410-0\"\n}"
+            },
+            "requestVariables": [],
+            "endpoint": "http://localhost:3000/lends",
+            "v": "3",
+            "name": "Alle ausgeliehenen Bücher abrufen",
+            "testScript": "",
+            "method": "POST",
+            "params": []
+        },
+        {
+            "auth": {
+                "authActive": false,
+                "authType": "none"
+            },
+            "endpoint": "http://localhost:3000/lends/1",
+            "preRequestScript": "",
+            "headers": [],
+            "method": "GET",
+            "name": "Einzelnes ausgeliehenes Buch abrufen",
+            "testScript": "",
+            "v": "3",
+            "params": [],
+            "requestVariables": [],
+            "body": {
+                "contentType": null,
+                "body": null
+            }
+        },
+        {
+            "preRequestScript": "",
+            "testScript": "",
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "endpoint": "http://localhost:3000/lends",
+            "requestVariables": [],
+            "headers": [],
+            "name": "Buch ausleihen",
+            "method": "POST",
+            "body": {
+                "contentType": "application/json",
+                "body": "{\n  \"isbn\": \"978-3-446-19345-3\"\n}"
+            },
+            "params": [],
+            "v": "3"
+        },
+        {
+            "auth": {
+                "authType": "none",
+                "authActive": false
+            },
+            "headers": [],
+            "method": "DELETE",
+            "requestVariables": [],
+            "endpoint": "http://localhost:3000/lends/1",
+            "testScript": "",
+            "preRequestScript": "",
+            "params": [],
+            "name": "Buch zurückgeben",
+            "v": "3",
+            "body": {
+                "contentType": null,
+                "body": null
+            }
+        }
+    ],
+    "auth": {
+        "authActive": false,
+        "authType": "inherit"
+    },
+    "headers": []
+}

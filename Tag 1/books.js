@@ -1,20 +1,3 @@
-/*
-GET	    /books	        Gibt die Liste von allen Büchern als JSON zurück
-GET	    /books/{isbn}	Gibt alle Informationen zu einem Buch als JSON zurück
-POST	/books	        Erstellt ein neues Buch in der Liste und gibt dasselbe Objekt wieder als JSON zurück
-PUT	    /books/{isbn}	Überschreibt das Buch in der Liste und gibt dasselbe Objekt wieder als JSON zurück
-DELETE	/books/{isbn}	Löscht das Buch in der Liste
-PATCH	/books/{isbn}	Ändert die Daten eines Buchs und gibt dasselbe aktualisierte Objekt wieder als JSON zurück
-
-Attribute von der Ressource Book:
-
-isbn: Eindeutige ID des Buches
-title: Titel des Buches
-year: Erscheinungsjahr des Buches
-author: Name des Autors
-Stellen Sie sicher, dass keine der Attribute leer sein kann. Geben sie ansonsten den Statuscode 422 zurück.
-*/
-
 const EXPRESS = require('express');
 const SESSION = require('express-session');
 const APP = EXPRESS();
@@ -75,8 +58,22 @@ let books = [
     }
 ];
 
+let lends = [
+    {
+        isbn: "978-3-16-148410-0",
+        customer_id: "zli@zli.ch",
+        borrowed_at: "2024-04-18T13:54:56.234Z"
+    }
+];
+
+let users = [
+    {
+        email: 'zli@zli.ch',
+        password: '1234'
+    }
+];
+
 APP.get("/books", (req, res) => {
-    // send books as json
     res.send(books);
 });
 
@@ -139,132 +136,82 @@ APP.patch("/books/:isbn", (req, res) => {
     }
 });
 
-/*
-GET	/lends	Gibt alle Ausleihen als als JSON zurück
-GET	/lends/{id}	Gibt alle Informationen zu einer Ausleihe als JSON zurück
-POST	/lends	Leiht ein neues Buch aus
-DELETE	/lends/{id}	Bringt ein Buch zurück
-*/
-
-let lends = [
-    {
-        id: '1',
-        isbn: '978-3-16-148410-0',
-    },
-    {
-        id: '2',
-        isbn: '978-3-16-148410-0',
-    },
-]
-
-APP.get('/lends', (req, res) => {
-    console.log(`Port: ${PORT}\tGET: /lends\t\t ${new Date().toString()}`);
-
-    res.send(lends);
+APP.get('/lends', verifyAuth, (req, res) => {
+    const lendBooks = books.filter((book) => lends.map((lend) => lend.isbn).includes(book.isbn));
+    res.send(lendBooks);
 });
 
-APP.get('/lends/:id', (req, res) => {
-    console.log(`Port: ${PORT}\tGET: /lends/:id\t\t ${new Date().toString()}`);
-    const id = req.params.id;
-    const lendsById = lends.filter((lend) => lend.id === id); // Funktioniert nicht
-    const book = books.filter((book) => book.isbn === lendsById[0].isbn);
+APP.get('/lends/:isbn', verifyAuth, (req, res) => {
+    const isbn = req.params.isbn;
+    const lend = lends.find((lend) => lend.isbn === isbn);
 
-    // send the book which has the isbn as the isbn in the lends list
-    res.send(book[0]);
-});
-
-APP.post('/lends', (req, res) => {
-    console.log(`Port: ${PORT}\tPOST: /lends\t\t ${new Date().toString()}`);
-    const lend = req.body.isbn;
-    // check if the book exists in the books list
-    const book = books.filter((book) => book.isbn === lend);
-
-    // if book is already in the lends list
-    if (lends.map((lend) => lend.isbn).includes(lend)) {
-        res.status(409).json({ error: "Book already lent" });
-        return;
-    }
-
-    if (book.length > 0) {
-        // generate a random id
-        const id = Math.floor(Math.random() * 1000).toString();
-        // add the lend to the lends list
-        lends.push({ id: id, isbn: lend });
-        res.send({ id: id, isbn: lend });
-    } else {
-        res.status(404).json({ error: "Book not found" });
-    }
-});
-
-APP.patch('/lends/:id', (req, res) => {
-    console.log(`Port: ${PORT}\tPATCH: /lends/:id\t\t ${new Date().toString()}`);
-    const id = req.params.id;
-    const lendIndex = lends.findIndex((lend) => lend.id === id);
-    const newLend = req.body;
-
-    if (lendIndex >= 0) {
-        lends[lendIndex] = { ...lends[lendIndex], ...newLend };
-        res.send(lends[lendIndex]);
+    if (lend) {
+        res.send(lend);
     } else {
         res.status(404).json({ error: "Lend not found" });
     }
 });
 
-/*
-Erweitern Sie Ihre REST API der Bibliothek. Erstellen Sie die Endpunkte für Login/Logout und schützen Sie die Endpunkte der Ressource Lend vor Zugriffen ohne Login.
+APP.post('/lends', verifyAuth, (req, res) => {
+    const lend = req.body.isbn;
+    const book = books.find((book) => book.isbn === lend);
 
-POST	/login	    Überprüft die als mitgegebenen Parameter email und password und markiert die Session als «authentifiziert»
-GET	    /verify	    Gibt den Statuscode 200 sowie die E-Mail Adresse des Benutzers zurück, wenn die Session als authentifiziert markiert wurde, andernfalls wird der Statuscode 401 zurück gegeben
-DELETE	/logout	    Markiert die aktuelle Session als «nicht authentifiziert» und gibt den Statuscode 204 zurück
-*/
-
-let users = [
-    {
-        email: 'zli@zli.ch',
-        password: '1234'
-    },
-    {
-        email: 'zli1@zli.ch',
-        password: '12345'
+    if (lends.map((lend) => lend.isbn).includes(lend)) {
+        res.status(409).json({ error: "Book already lent" });
+        return;
     }
-]
 
-APP.post('/login', (req, res) => {
-    log(req, res);
-    
-    const email = req.query.email;
-    const password = req.query.password;
-    const user = users.filter((user) => user.email === email && user.password === password);
-
-    if (user.length > 0) {
-        req.session.authenticated = true;
-        res.send('Login successful');
+    if (book && lends.filter((lend) => lend.customer_id === req.session.user_id).length < 3) {
+        lends.push({ isbn: lend, customer_id: req.session.user_id, borrowed_at: new Date() });
+        res.send(lends);
     } else {
-        res.status(401).send('Login failed');
+        res.status(404).json({ error: "Book not found or maximum lends reached" });
     }
 });
 
-APP.get('/verify', (req, res) => {
-    log(req, res);
+APP.delete('/lends/:id', verifyAuth, (req, res) => {
+    const isbn = req.params.isbn;
+    const lendIndex = lends.findIndex((lend) => lend.isbn === isbn);
 
-    if (req.session.authenticated) {
-        res.status(200).send(req.query.email);
+    if (lendIndex >= 0) {
+        lends.splice(lendIndex, 1);
+        res.send({ message: "Book returned" });
     } else {
-        res.status(401).send('Unauthorized');
+        res.status(404).json({ error: "Lend not found" });
     }
+});
+
+APP.post('/login', (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    const user = users.find((user) => user.email === email && user.password === password);
+
+    if (user) {
+        req.session.authenticated = true;
+        req.session.user_id = email; // assuming email is unique
+        res.status(201).json({ email: email });
+    } else {
+        res.status(401).json({ error: "Login failed" });
+    }
+});
+
+APP.get('/verify', verifyAuth, (req, res) => {
+    res.status(200).json({ email: req.session.user_id });
 });
 
 APP.delete('/logout', (req, res) => {
-    log(req, res);
-    
     req.session.authenticated = false;
-    res.status(204).send('Logout successful');
+    res.status(204).end();
 });
 
 APP.listen(PORT, () => {
     console.log("Server is listening on Port: " + PORT)
 });
 
-function log(req, res) {
-    console.log(`Port: ${PORT}\t${req.method}\t${req.originalUrl}\t${new Date().toString()}`);
+function verifyAuth(req, res, next) {
+    if (req.session.authenticated) {
+        next();
+    } else {
+        res.status(401).json({ error: "Unauthorized" });
+    }
 }
