@@ -25,7 +25,7 @@ app.use("/private", (req, res, next) => {
     res.status(401).send('Authentication required.'); // custom message
 })
 
-app.get('/private', (req, res) => {
+app.get('/private/admin', (req, res) => {
     res.send('Willkommen im privaten Bereich!');
 });
 
